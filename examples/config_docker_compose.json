@@ -1,0 +1,21 @@
+{
+    "projectname": "Docker Compose Setup",
+    "os": "linux",
+    "tasks": [
+        {
+            "name": "setup_docker_compose",
+            "install": [
+                "mkdir -p ~/docker_setup",
+                "cp ./docker-compose.yml ~/docker_setup/docker-compose.yml",
+                "cd ~/docker_setup && docker compose up -d"
+            ],
+            "validate": [
+                "docker compose ls | grep docker_setup"
+            ],
+            "uninstall": [
+                "cd ~/docker_setup && docker compose down",
+                "rm -rf ~/docker_setup"
+            ]
+        }
+    ]
+}

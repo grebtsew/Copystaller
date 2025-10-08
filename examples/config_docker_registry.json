@@ -1,0 +1,21 @@
+{
+    "projectname": "Install Docker Registry",
+    "os": "linux",
+    "tasks": [
+        {
+            "name": "install_docker_registry",
+            "install": [
+                "sudo mkdir -p /opt/registry",
+                "sudo docker run -d -p 5000:5000 --restart=always --name registry -v /opt/registry:/var/lib/registry registry:2"
+            ],
+            "validate": [
+                "sudo docker ps | grep registry"
+            ],
+            "uninstall": [
+                "sudo docker stop registry",
+                "sudo docker rm registry",
+                "sudo rm -rf /opt/registry"
+            ]
+        }
+    ]
+}

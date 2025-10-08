@@ -1,0 +1,28 @@
+{
+    "projectname": "Dummy Test Task",
+    "os": "linux",
+    "tasks": [
+        {
+            "name": "dummy_test",
+            "install": [
+                "echo '=== Start dummy installation ==='",
+                "echo 'Creating test file...'",
+                "touch ./fil.txt",
+                "echo 'File created successfully.'",
+                "echo 'Simulating progress step 1'",
+                "sleep 1",
+                "echo 'Simulating progress step 2'",
+                "sleep 1",
+                "echo 'Installation complete!'"
+            ],
+            "validate": [
+                "test -f ./fil.txt"
+            ],
+            "uninstall": [
+                "echo 'Removing test file...'",
+                "rm -f ./fil.txt",
+                "echo 'Cleanup complete.'"
+            ]
+        }
+    ]
+}

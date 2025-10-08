@@ -1,0 +1,21 @@
+{
+    "projectname": "Install Certificates",
+    "os": "linux",
+    "tasks": [
+        {
+            "name": "install_certificates",
+            "install": [
+                "sudo mkdir -p /usr/local/share/ca-certificates/custom",
+                "sudo cp ./certs/*.crt /usr/local/share/ca-certificates/custom/",
+                "sudo update-ca-certificates"
+            ],
+            "validate": [
+                "ls /etc/ssl/certs | grep custom"
+            ],
+            "uninstall": [
+                "sudo rm -rf /usr/local/share/ca-certificates/custom",
+                "sudo update-ca-certificates --fresh"
+            ]
+        }
+    ]
+}

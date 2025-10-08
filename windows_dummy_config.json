@@ -1,0 +1,28 @@
+{
+    "projectname": "Dummy Test Task",
+    "os": "windows",
+    "tasks": [
+        {
+            "name": "dummy_test",
+            "install": [
+                "echo === Start dummy installation ===",
+                "echo Creating test file...",
+                "type nul > fil.txt",
+                "echo File created successfully.",
+                "echo Simulating progress step 1",
+                "timeout /t 1 > nul",
+                "echo Simulating progress step 2",
+                "timeout /t 1 > nul",
+                "echo Installation complete!"
+            ],
+            "validate": [
+                "if exist fil.txt (exit 0) else (exit 1)"
+            ],
+            "uninstall": [
+                "echo Removing test file...",
+                "del /f /q fil.txt",
+                "echo Cleanup complete."
+            ]
+        }
+    ]
+}
