@@ -4,6 +4,10 @@ A super simple program for copy and installing programs by defining which comman
 
 ![demo](./docs/demo.png)
 
+![CI](https://github.com/grebtsew/Copystaller/actions/workflows/ci.yml/badge.svg)
+![license](https://img.shields.io/github/license/grebtsew/Copystaller)
+![size](https://img.shields.io/github/repo-size/grebtsew/Copystaller)
+![commit](https://img.shields.io/github/last-commit/grebtsew/Copystaller)
 
 # Run
 
@@ -17,8 +21,47 @@ pip install -r ./requirements.txt
 python ./src/main.py
 ```
 
+# Config
+See example config below.
+
+```json
+{
+    "projectname": "Dummy Test Task",
+    "os": "linux",
+    "tasks": [
+        {
+            "name": "dummy_test",
+            "install": [
+                "echo '=== Start dummy installation ==='",
+                "echo 'Creating test file...'",
+                "touch ./fil.txt",
+                "echo 'File created successfully.'",
+                "echo 'Simulating progress step 1'",
+                "sleep 1",
+                "echo 'Simulating progress step 2'",
+                "sleep 1",
+                "echo 'Installation complete!'"
+            ],
+            "validate": [
+                "test -f ./fil.txt"
+            ],
+            "uninstall": [
+                "echo 'Removing test file...'",
+                "rm -f ./fil.txt",
+                "echo 'Cleanup complete.'"
+            ]
+        }
+    ]
+}
+
+```
+
+
 # Tests
-upcoming...
+Vital and core functionality are tested with pytest. To run tests yourself enter `Test`-folder and run:
+```cmd
+pytest .
+```
 
 # License
 

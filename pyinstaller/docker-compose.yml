@@ -1,0 +1,15 @@
+version: "3.9"
+
+# docker-compose -f ./pyinstaller/docker-compose.yml up --build
+
+services:
+  pyinstallerbuilder:
+    build:
+      context: ../
+      dockerfile: ./pyinstaller/Dockerfile
+    volumes:
+      - ../dist:/app/dist
+    
+
+volumes:
+  build_output:
