@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      QT_QPA_PLATFORM: offscreen
     steps:
       # 1. Checka ut koden
       - name: Checkout repository
