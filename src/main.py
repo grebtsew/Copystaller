@@ -411,6 +411,7 @@ class MainWindow(QMainWindow):
         palette.setColor(QPalette.Text, Qt.white)
         palette.setColor(QPalette.Button, QColor(40, 40, 40))
         palette.setColor(QPalette.ButtonText, Qt.white)
+
         self.setPalette(palette)
 
     # ---------- Task logic ----------
