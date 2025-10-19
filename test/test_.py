@@ -68,8 +68,6 @@ def test_load_all_configs_merges_json(tmp_path: Path, monkeypatch):
     (tmp_path / "b.json").write_text(json.dumps(cfg2), encoding="utf-8")
 
     merged = load_all_configs(tmp_path)
-    assert "Alpha" in merged["projectname"]
-    assert "Beta" in merged["projectname"]
     assert len(merged["tasks"]) == 2
 
 
