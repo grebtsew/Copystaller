@@ -401,6 +401,9 @@ class MainWindow(QMainWindow):
         self.log_output.insertPlainText(text)
         self.log_output.moveCursor(cursor.End)
 
+        with open(self.log_path, "a", encoding="utf-8") as f:
+            f.write(f"{text}")
+
     # ---------- Dark theme ----------
     def apply_dark_theme(self):
         palette = QPalette()

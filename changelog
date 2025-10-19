@@ -8,6 +8,7 @@ Update for user feedback
 - Updated readme demo image
 - Updated colors
 - Updated unittests
+- Fixed logging to file error
 
 ### Added
 - Task completion timer
