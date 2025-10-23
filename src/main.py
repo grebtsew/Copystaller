@@ -4,6 +4,8 @@ copystaller.py — Modern Dark Mode Edition 🌙
 A stylish PyQt5-based GUI for running install/uninstall tasks from JSON config.
 """
 
+import html
+
 import platform
 from pathlib import Path
 import json
@@ -130,8 +132,13 @@ class ValidatorThread(QThread):
 
     def run(self):
         for idx, task in enumerate(self.tasks):
-            valid = False
+            valid = True  # anta att giltig tills motsatsen bevisas
             val_cmds = task.get("validate", []) or []
+
+            self._append_log(
+                f"\n[Validator] Validating task '{task.get('name', idx)}':\n"
+            )
+
             for cmd in val_cmds:
                 try:
                     if self.is_windows:
@@ -151,12 +158,34 @@ class ValidatorThread(QThread):
                             stderr=subprocess.PIPE,
                             cwd=None,
                         )
+                    # Logga utdata
+                    out = completed.stdout.decode("utf-8", errors="replace")
+                    err = completed.stderr.decode("utf-8", errors="replace")
+                    self._append_log(f"  Command: {cmd}\n")
+                    if out.strip():
+                        self._append_log(f"  Output: {out}")
+                    if err.strip():
+                        self._append_log(f"  Error: {err}")
+                    self._append_log(f"  Exit code: {completed.returncode}\n")
                     if completed.returncode == 0:
-                        valid = True
-                        break
-                except Exception:
+                        self._append_log("✅ Validation Succeeded! \n")
+                    else:
+                        self._append_log("⚠️ Validation failed! \n")
+
+                    if completed.returncode != 0:
+                        valid = False  # Om ett kommando misslyckas, blir hela tasken invalid
+                        # Du kan bryta här om du vill
+                        # break
+
+                except Exception as e:
+                    self._append_log(f"  Exception: {e}\n")
                     valid = False
+
             self.signals.task_update.emit(idx, valid)
+
+    def _append_log(self, text: str):
+
+        self.signals.log.emit(text)
 
 
 # ---------------------------- GUI COMPONENTS ----------------------------------
@@ -347,16 +376,25 @@ class MainWindow(QMainWindow):
 
         self.log_output = QTextEdit()
         self.log_output.setReadOnly(True)
+
         self.log_output.setStyleSheet(
             """
-            QTextEdit { background-color: #151515; color: #dcdcdc; border-radius: 8px;
-            font-family: Consolas, monospace; font-size: 10pt; padding: 8px; }
-            QScrollBar:vertical { background: #2b2b2b; width: 12px; border-radius: 6px; }
-            QScrollBar::handle:vertical { background: #505050; min-height: 20px; border-radius: 6px; }
-            QScrollBar::handle:vertical:hover { background: #888888; }
-            QScrollBar::add-line, QScrollBar::sub-line { height: 0px; }
-        """
+                    QTextEdit { 
+                        background-color: #151515; 
+                        color: #dcdcdc; 
+                        border-radius: 8px;
+                        /* Ta bort font-family här! */
+                        font-size: 10pt; 
+                        padding: 8px; 
+                    }
+                    QScrollBar:vertical { background: #2b2b2b; width: 12px; border-radius: 6px; }
+                    QScrollBar::handle:vertical { background: #505050; min-height: 20px; border-radius: 6px; }
+                    QScrollBar::handle:vertical:hover { background: #888888; }
+                    QScrollBar::add-line, QScrollBar::sub-line { height: 0px; }
+                """
         )
+        self.log_output.setFontFamily("Segoe UI Emoji")
+
         main_layout.addWidget(self.log_output, stretch=1)
 
         btn_style = """
@@ -394,15 +432,23 @@ class MainWindow(QMainWindow):
 
     # ---------- Logging ----------
     def append_log(self, text, color="#dcdcdc"):
+        # Ersätt escape-sekvenser för radbrytningar
         text = text.replace("\\n", "\n")
+        # Escapa HTML-specialtecken
+        escaped_text = html.escape(text)
+        # Byt ut radbrytningar mot <br> för HTML
+        html_text = escaped_text.replace("\n", "<br>")
+
         cursor = self.log_output.textCursor()
         cursor.movePosition(cursor.End)
         self.log_output.setTextCursor(cursor)
-        self.log_output.insertPlainText(text)
+        # Infoga texten med färg
+        self.log_output.insertHtml(f'<span style="color:{color};">{html_text}</span>')
         self.log_output.moveCursor(cursor.End)
 
+        # Skriv texten till loggfilen utan HTML
         with open(self.log_path, "a", encoding="utf-8") as f:
-            f.write(f"{text}")
+            f.write(text)
 
     # ---------- Dark theme ----------
     def apply_dark_theme(self):
@@ -431,6 +477,9 @@ class MainWindow(QMainWindow):
                 self, "⚡ No task", "Select at least one task with install commands."
             )
             return
+
+        self.append_log(f"[INSTALL] Triggered ")
+
         self.disable_ui()
         self.runner_start_time = time.time()
         self.runner = CommandRunner(commands, self.log_path, self.signals)
@@ -449,6 +498,9 @@ class MainWindow(QMainWindow):
                 self, "🗑 No task", "Select at least one task with uninstall commands."
             )
             return
+
+        self.append_log(f"[UNINSTALL] Triggered ")
+
         self.disable_ui()
         self.runner_start_time = time.time()
         self.runner = CommandRunner(commands, self.log_path, self.signals)
